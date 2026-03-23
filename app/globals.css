@@ -19,15 +19,16 @@
 html, body {
   width: 100%;
   height: 100%;
-  /* Use dvh so the canvas fills visible area on mobile (excludes browser chrome) */
   min-height: 100dvh;
-  background: var(--dark-bg);
+  background: #000;
   color: #fff;
   font-family: var(--font-orbitron), 'Orbitron', sans-serif;
   overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
   overscroll-behavior: none;
+  /* Support notch phones */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 /* Remove default button styles */

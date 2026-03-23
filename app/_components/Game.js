@@ -973,14 +973,24 @@ export default function Game() {
     function applyScale() {
       const el = wrapperRef.current
       if (!el) return
-      const raw = Math.min(window.innerWidth / 900, window.innerHeight / 600)
-      // On desktop, cap at 1 so it doesn't blow up; on mobile, fill the screen
-      const scale = window.innerWidth > 1024 ? Math.min(raw, 1) : raw
+      const vp = window.visualViewport || { width: window.innerWidth, height: window.innerHeight }
+      const vw = vp.width, vh = vp.height
+      const isMobile = vw <= 1024
+      const scaleX = vw / 900
+      const scaleY = vh / 600
+      // Desktop: contain (fit inside, capped at 1). Mobile: cover (fill screen, no bars)
+      const scale = isMobile ? Math.max(scaleX, scaleY) : Math.min(scaleX, scaleY, 1)
       el.style.transform = `scale(${scale})`
     }
     applyScale()
     window.addEventListener('resize', applyScale)
-    return () => window.removeEventListener('resize', applyScale)
+    window.addEventListener('orientationchange', () => setTimeout(applyScale, 150))
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', applyScale)
+    return () => {
+      window.removeEventListener('resize', applyScale)
+      window.removeEventListener('orientationchange', applyScale)
+      if (window.visualViewport) window.visualViewport.removeEventListener('resize', applyScale)
+    }
   }, [])
 
   useEffect(() => {

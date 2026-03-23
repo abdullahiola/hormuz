@@ -173,8 +173,16 @@
   .portraitOverlay { display: none !important; }
 }
 
-/* On mobile landscape, let game scale beyond 1 to fill screen */
-@media (max-height: 500px) and (orientation: landscape) {
-  .container { background: #000; }
-  .wrapper { border-width: 1px; border-radius: 0; }
+/* On mobile landscape, fill the entire screen edge-to-edge */
+@media (max-width: 1024px) and (orientation: landscape) {
+  .container {
+    background: #000;
+    padding: 0;
+    margin: 0;
+  }
+  .wrapper {
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
 }
