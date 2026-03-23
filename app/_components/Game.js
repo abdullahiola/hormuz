@@ -98,21 +98,20 @@ let shipId = 0
 const ENEMY_NATIONS = ['usa', 'israel', 'saudi', 'uae']
 
 function createShip(cfg) {
-  const trump = Math.random() < 0.18  // Trump flagship variant
   const nation = ENEMY_NATIONS[Math.floor(Math.random() * ENEMY_NATIONS.length)]
   const topY = coastY(IRAN_COAST, 0) + 30
   const botY = coastY(OMAN_COAST, 0) - 30
   return {
     id: shipId++,
-    kind: trump ? 'trump' : 'us',
-    nation: trump ? 'usa' : nation,
+    kind: 'us',
+    nation,
     x: -130,
     y: topY + Math.random() * (botY - topY),
     speed: cfg.speed * (0.78 + Math.random() * 0.44),
-    hp: cfg.hp + (trump ? 2 : 0),
-    maxHp: cfg.hp + (trump ? 2 : 0),
-    width:  trump ? 110 : 78,
-    height: trump ? 44  : 32,
+    hp: cfg.hp,
+    maxHp: cfg.hp,
+    width: 78,
+    height: 32,
     wobble: Math.random() * Math.PI * 2,
     reached: false,
     friendly: false,
