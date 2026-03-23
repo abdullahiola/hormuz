@@ -13,6 +13,13 @@ const cinzel = Cinzel_Decorative({
   weight: ['700'],
 })
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+}
+
 export const metadata = {
   title: 'Lord of the Straits 🛢️',
   description: 'Defend the Strait of Hormuz — a browser game inspired by the Iranian animated video mocking Trump.',

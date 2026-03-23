@@ -1,3 +1,15 @@
+/* Outer centering div — fills the whole screen */
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100dvh;
+  background: radial-gradient(ellipse at center, #0d1b2a 0%, #060c14 100%);
+  overflow: hidden;
+}
+
+/* Game canvas wrapper — fixed native size, scaled via JS transform */
 .wrapper {
   position: relative;
   width: 900px;
@@ -6,7 +18,11 @@
   border-radius: 12px;
   box-shadow: 0 0 40px rgba(46,204,113,0.3), 0 0 80px rgba(46,204,113,0.1);
   overflow: hidden;
-  margin: auto;
+  /* transform set via inline style in JS */
+  transform-origin: center center;
+  /* Prevent mobile long-press context menus */
+  -webkit-touch-callout: none;
+  touch-action: none;
 }
 
 .canvas {
@@ -14,6 +30,7 @@
   width: 900px;
   height: 600px;
   cursor: crosshair;
+  touch-action: none;
 }
 
 /* ── HUD ── */
@@ -42,22 +59,23 @@
 /* ── Ammo ── */
 .ammoHud {
   position: absolute;
-  bottom: 12px; left: 20px;
-  display: flex; gap: 5px;
+  bottom: 12px; left: 12px;
+  display: flex; gap: 5px; flex-wrap: wrap; max-width: 120px;
   z-index: 10; pointer-events: none;
 }
 .ammoDot {
-  width: 10px; height: 10px; border-radius: 50%;
+  width: 12px; height: 12px; border-radius: 50%;
   background: #2ecc71; box-shadow: 0 0 6px #2ecc71;
   transition: background 0.15s;
 }
 .used { background: #2a2a2a !important; box-shadow: none !important; }
 
 .tooltip {
-  position: absolute; bottom: 12px; right: 20px;
-  font-size: 9px; color: #444; letter-spacing: 1px;
+  position: absolute; bottom: 12px; right: 8px;
+  font-size: 8px; color: #444; letter-spacing: 1px;
   z-index: 10; pointer-events: none;
   font-family: var(--font-orbitron), monospace;
+  text-align: right; max-width: 180px; line-height: 1.5;
 }
 
 /* ── Overlays ── */
