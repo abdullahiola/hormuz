@@ -120,7 +120,7 @@ function createShip(cfg) {
 
 // Friendly (Chinese) cargo ship — don't shoot!
 // Allied nations: ships from these countries have safe passage
-const ALLIED_NATIONS = ['iran', 'syria', 'russia', 'china']
+const ALLIED_NATIONS = ['syria', 'russia', 'china']
 
 function createFriendlyShip() {
   const topY = coastY(IRAN_COAST, 0) + 40
@@ -791,6 +791,37 @@ export default function Game() {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
+
+    // Size canvas to fill screen on mobile, or fixed 900×600 on desktop
+    const vp = window.visualViewport || { width: window.innerWidth, height: window.innerHeight }
+    const isMobile = vp.width <= 1024
+    const dpr = window.devicePixelRatio || 1
+
+    if (isMobile) {
+      // Mobile: canvas fills entire screen at native resolution
+      const sw = Math.round(vp.width * dpr)
+      const sh = Math.round(vp.height * dpr)
+      if (canvas.width !== sw || canvas.height !== sh) {
+        canvas.width  = sw
+        canvas.height = sh
+        canvas.style.width  = vp.width + 'px'
+        canvas.style.height = vp.height + 'px'
+      }
+      // Scale drawing so 900×600 game coords fill the entire screen
+      const sx = (vp.width * dpr) / W
+      const sy = (vp.height * dpr) / H
+      ctx.setTransform(sx, 0, 0, sy, 0, 0)
+    } else {
+      // Desktop: fixed 900×600 at DPR
+      if (canvas.width !== W * dpr) {
+        canvas.width  = W * dpr
+        canvas.height = H * dpr
+        canvas.style.width  = W + 'px'
+        canvas.style.height = H + 'px'
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    }
+
     const dt = t - s.lastTime; s.lastTime = t
     ctx.clearRect(0, 0, W, H)
 
@@ -968,19 +999,25 @@ export default function Game() {
     s.rafId = requestAnimationFrame(loop)
   }, [spawnExplosion, startWave, updateHUD, showGameOver, showWin])
 
-  // Scale the 900×600 wrapper to fit any screen size
+  // Scale the 900×600 wrapper — only needed on desktop
   useEffect(() => {
     function applyScale() {
       const el = wrapperRef.current
       if (!el) return
       const vp = window.visualViewport || { width: window.innerWidth, height: window.innerHeight }
-      const vw = vp.width, vh = vp.height
-      const isMobile = vw <= 1024
-      const scaleX = vw / 900
-      const scaleY = vh / 600
-      // Desktop: contain (fit inside, capped at 1). Mobile: cover (fill screen, no bars)
-      const scale = isMobile ? Math.max(scaleX, scaleY) : Math.min(scaleX, scaleY, 1)
-      el.style.transform = `scale(${scale})`
+      const isMobile = vp.width <= 1024
+      if (isMobile) {
+        // Mobile: wrapper fills the screen, no CSS transform needed
+        el.style.width  = vp.width + 'px'
+        el.style.height = vp.height + 'px'
+        el.style.transform = 'none'
+      } else {
+        // Desktop: fixed 900×600, scale to fit
+        el.style.width  = '900px'
+        el.style.height = '600px'
+        const scale = Math.min(vp.width / 900, vp.height / 600, 1)
+        el.style.transform = `scale(${scale})`
+      }
     }
     applyScale()
     window.addEventListener('resize', applyScale)
@@ -1013,7 +1050,6 @@ export default function Game() {
     <div ref={wrapperRef} className={styles.wrapper}>
       <canvas
         ref={canvasRef}
-        width={W} height={H}
         className={styles.canvas}
         onClick={handleClick}
         onTouchStart={handleTouch}
