@@ -127,3 +127,54 @@
 .btn:hover { background: #2ecc71; color: #000; box-shadow: 0 0 24px #2ecc71; }
 .btnRed { border-color: #e74c3c !important; color: #e74c3c !important; }
 .btnRed:hover { background: #e74c3c !important; color: #fff !important; box-shadow: 0 0 24px #e74c3c !important; }
+
+/* ── Portrait orientation overlay ── */
+.portraitOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: radial-gradient(ellipse at center, #0d1b2a 0%, #060c14 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  color: #2ecc71;
+  font-family: var(--font-orbitron), monospace;
+  text-align: center;
+  padding: 24px;
+}
+
+.rotateIcon {
+  font-size: 64px;
+  animation: rotateHint 2s ease-in-out infinite;
+}
+
+.rotateText {
+  font-size: 16px;
+  letter-spacing: 3px;
+  color: #ccc;
+  line-height: 1.8;
+}
+
+.rotateText span {
+  color: #2ecc71;
+  font-weight: bold;
+}
+
+@keyframes rotateHint {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-20deg); }
+  75%      { transform: rotate(20deg); }
+}
+
+/* Hide portrait overlay when landscape */
+@media (orientation: landscape) {
+  .portraitOverlay { display: none !important; }
+}
+
+/* On mobile landscape, let game scale beyond 1 to fill screen */
+@media (max-height: 500px) and (orientation: landscape) {
+  .container { background: #000; }
+  .wrapper { border-width: 1px; border-radius: 0; }
+}

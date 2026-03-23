@@ -41,11 +41,11 @@ function processSprite(src, onDone) {
 }
 
 let droneImg = null
-const shipImgs = { us: null, trump: null, china: null }
+const shipImgs = { us: null, china: null }
 if (typeof window !== 'undefined') {
   processSprite('/shahed136.png',  c => { droneImg = c })
   processSprite('/ship_us.png',    c => { shipImgs.us    = c })
-  processSprite('/ship_trump.png', c => { shipImgs.trump  = c })
+
   processSprite('/ship_china.png', c => { shipImgs.china  = c })
 }
 
@@ -574,7 +574,7 @@ function drawShip(ctx, s, t) {
     ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh)
   } else {
     // Fallback canvas shapes while image loads
-    ctx.fillStyle = s.kind === 'trump' ? '#8B1A1A' : s.kind === 'china' ? '#e07b39' : '#556677'
+    ctx.fillStyle = s.kind === 'china' ? '#e07b39' : '#556677'
     ctx.beginPath()
     const W2 = s.width / 2, H2 = s.height / 2
     ctx.moveTo(-W2, 0)
@@ -600,9 +600,9 @@ function drawShip(ctx, s, t) {
     ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1
     ctx.beginPath(); ctx.moveTo(0, -s.height / 2); ctx.lineTo(0, -s.height - efH - 4); ctx.stroke()
     // Nation label
-    ctx.fillStyle = s.kind === 'trump' ? '#FFD700' : 'rgba(255,200,200,0.8)'
+    ctx.fillStyle = 'rgba(255,200,200,0.8)'
     ctx.font = 'bold 7px Orbitron'; ctx.textAlign = 'center'
-    ctx.fillText(s.kind === 'trump' ? 'TRUMP' : (NATION_LABELS[s.nation] || 'USA'), 0, s.height + 14)
+    ctx.fillText(NATION_LABELS[s.nation] || 'ENEMY', 0, s.height + 14)
   } else {
     // Friendly ship: draw nation flag above
     const flagW = 28, flagH = 18
@@ -877,10 +877,10 @@ export default function Game() {
             } else {
               ship.hp--; playSound('hit')
               if (ship.hp <= 0) {
-                spawnExplosion(ship.x, ship.y, ship.kind === 'trump')
+                spawnExplosion(ship.x, ship.y, false)
                 playSound('boom')
-                s.score    += ship.kind === 'trump' ? 500 : 100
-                s.oilPrice += ship.kind === 'trump' ? 20  : 5
+                s.score    += 100
+                s.oilPrice += 5
                 s.ships.splice(j, 1); updateHUD()
               }
             }
@@ -973,7 +973,9 @@ export default function Game() {
     function applyScale() {
       const el = wrapperRef.current
       if (!el) return
-      const scale = Math.min(window.innerWidth / 900, window.innerHeight / 600, 1)
+      const raw = Math.min(window.innerWidth / 900, window.innerHeight / 600)
+      // On desktop, cap at 1 so it doesn't blow up; on mobile, fill the screen
+      const scale = window.innerWidth > 1024 ? Math.min(raw, 1) : raw
       el.style.transform = `scale(${scale})`
     }
     applyScale()
@@ -988,6 +990,15 @@ export default function Game() {
   }, [loop])
 
   return (
+    <>
+    {/* Portrait orientation prompt — hidden by CSS in landscape */}
+    <div className={styles.portraitOverlay}>
+      <div className={styles.rotateIcon}>📱</div>
+      <div className={styles.rotateText}>
+        <span>Rotate your device</span><br />
+        to landscape mode to play
+      </div>
+    </div>
     <div className={styles.container}>
     <div ref={wrapperRef} className={styles.wrapper}>
       <canvas
@@ -1032,7 +1043,7 @@ export default function Game() {
         <p className={styles.subtitle}>🛢️ Defend the Strait of Hormuz 🛢️</p>
         <p className={styles.desc}>
           The IRIAF F-14 patrols overhead — <span>click the water</span> to fire missiles.<br />
-          Sink US warships (<span>+100 pts</span>) and Trump flagships (<span>+500 pts</span>).<br />
+          Sink enemy warships (<span>+100 pts</span>).<br />
           🇨🇳 <span style={{color:'#2ecc71'}}>Chinese cargo ships have safe passage</span> — do NOT fire on them!<br />
           Survive all 6 waves to secure the strait.
         </p>
@@ -1056,5 +1067,6 @@ export default function Game() {
       </div>
     </div>
     </div>
+    </>
   )
 }
